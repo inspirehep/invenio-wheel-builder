@@ -8,19 +8,15 @@ MAINTAINER Alessio Deiana "alessio.deiana@cern.ch"
 
 RUN apt-get update
 
-# Database
-RUN apt-get install -y mariadb-server libmariadbclient-dev
+ENV DEBIAN_FRONTEND noninteractive
 
-# Webserver
-RUN apt-get install -y \
+RUN apt-get install -y apt-utils
+
+RUN apt-get install -y git unzip wget \
     python-pip redis-server python-dev libssl-dev libxml2-dev libxslt-dev \
-    gnuplot clisp automake pstotext gettext
-RUN apt-get install -y git
-RUN pip install git+https://bitbucket.org/osso/invenio-devserver.git
+    gnuplot clisp automake pstotext gettext mysql-server libmysqlclient-dev
 
-# System
-RUN apt-get install -y unzip wget
-
+RUN apt-get install -y cython
 
 ###############
 # Create user #
@@ -28,8 +24,6 @@ RUN apt-get install -y unzip wget
 
 RUN useradd --create-home --password docker docker
 RUN echo "docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-ENV HOME /home/docker
-USER docker
 
 
 ###################
@@ -41,14 +35,14 @@ RUN git clone https://github.com/inveniosoftware/invenio.git /home/docker/inveni
 WORKDIR /home/docker/invenio
 
 # Installing Invenio requirements
-RUN sudo pip install -r requirements.txt
-RUN sudo pip install -r requirements-extras.txt
+RUN pip install -r requirements.txt
+RUN pip install -r requirements-extras.txt
 
 #################
 # Devpi related #
 #################
 
-RUN sudo pip install devpi-client
+RUN pip install devpi-client
 RUN devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
 RUN pip freeze > installed_packages.txt
 RUN pip wheel --wheel-dir=wheels -r installed_packages.txt
