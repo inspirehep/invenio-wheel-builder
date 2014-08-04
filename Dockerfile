@@ -43,6 +43,9 @@ RUN pip install -r requirements-extras.txt
 
 RUN pip install devpi-client wheel
 RUN pip install -U pip setuptools
+
+WORKDIR /home/docker
+
 RUN pip freeze | grep -iv pyrxp | grep -iv pychecker | grep -iv winpdb > installed_packages.txt
 RUN cat installed_packages.txt
 RUN mkdir packages
@@ -59,4 +62,3 @@ ADD upload_packages.sh /home/docker/upload_packages.sh
 # Startup #
 ###########
 
-WORKDIR /home/docker
