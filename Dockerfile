@@ -53,12 +53,10 @@ RUN pip wheel --allow-external gnuplot-py --allow-unverified gnuplot-py \
               --download-cache=packages \
               --wheel-dir=wheels -r installed_packages.txt
 RUN devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
-ADD prepare_packages.sh /home/docker/prepare_packages.sh
+ADD upload_packages.sh /home/docker/upload_packages.sh
 
 ###########
 # Startup #
 ###########
 
 WORKDIR /home/docker
-#ENTRYPOINT ["/home/docker/prepare_packages.sh"]
-#ENTRYPOINT ["/bin/bash"]
