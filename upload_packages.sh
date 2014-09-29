@@ -1,1 +1,2 @@
-devpi upload --from-dir=wheels
+devpi login $1 --password '$2'
+devpi upload --from-dir wheels

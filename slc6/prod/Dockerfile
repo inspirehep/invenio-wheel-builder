@@ -1,4 +1,4 @@
-FROM ubuntu:12.04
+FROM cern/slc6-base
 MAINTAINER Alessio Deiana "alessio.deiana@cern.ch"
 
 
@@ -6,16 +6,13 @@ MAINTAINER Alessio Deiana "alessio.deiana@cern.ch"
 # Requirements #
 ################
 
-RUN apt-get update
-
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get install -y apt-utils
-
-RUN apt-get install -y git unzip wget \
-    python-pip redis-server python-dev libssl-dev libxml2-dev libxslt-dev \
-    gnuplot clisp automake pstotext gettext mysql-server libmysqlclient-dev \
-    cython libhdf5-serial-dev
+RUN yum install -y git unzip wget \
+    python-pip python-devel openssl-devel hdf5-devel automake \
+    gettext-devel gcc mysql python-ipython python-virtualenvwrapper \
+    sbcl freetype-devel libxslt-devel libxml2-devel gnuplot gnuplot-py \
+    mod_xsendfile arc afs_tools perl-DBI screen postfix lwp \
+    colordiff perl-TermReadKey GraphicsMagick gcc-c++ ksh \
+    mysql-devel python27 Cython
 
 ###############
 # Create user #
@@ -46,7 +43,7 @@ RUN pip install -U pip setuptools
 
 WORKDIR /home/docker
 
-RUN pip freeze | grep -iv pyrxp | grep -iv pychecker | grep -iv winpdb > installed_packages.txt
+RUN pip freeze | grep -iv pyrxp | grep -iv pychecker | grep -iv winpdb | grep -iv matplotlib > installed_packages.txt
 RUN cat installed_packages.txt
 RUN mkdir packages
 RUN pip install --allow-unverified gnuplot-py \
@@ -56,7 +53,7 @@ RUN pip wheel --allow-external gnuplot-py --allow-unverified gnuplot-py \
               --download-cache=packages \
               --wheel-dir=wheels -r installed_packages.txt
 RUN devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
-ADD upload_packages.sh /home/docker/upload_packages.sh
+ADD ../upload_packages.sh /home/docker/upload_packages.sh
 
 ###########
 # Startup #
