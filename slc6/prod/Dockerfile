@@ -1,4 +1,4 @@
-FROM cern/slc6-base
+FROM cern:slc6-base
 MAINTAINER Alessio Deiana "alessio.deiana@cern.ch"
 
 
@@ -32,14 +32,19 @@ WORKDIR /home/docker/invenio
 
 # Installing Invenio requirements
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-extras.txt
+RUN pip install -r requirements-extras.txt --allow-unverified gnuplot-py --allow-external gnuplot-py
 
 #################
 # Devpi related #
 #################
 
 RUN pip install devpi-client wheel
-RUN pip install -U pip setuptools
+
+RUN sudo apt-get remove python-requests -y
+RUN wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+RUN python get-pip.py
+RUN hash -r
+RUN pip install requests==2.2
 
 WORKDIR /home/docker
 
@@ -52,6 +57,8 @@ RUN pip install --allow-unverified gnuplot-py \
 RUN pip wheel --allow-external gnuplot-py --allow-unverified gnuplot-py \
               --download-cache=packages \
               --wheel-dir=wheels -r installed_packages.txt
+
+RUN pip install requests==2.3
 RUN devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
 ADD ../upload_packages.sh /home/docker/upload_packages.sh
 
